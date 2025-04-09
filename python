@@ -1,0 +1,27 @@
+# Import necessary libraries
+import pandas as pd
+
+# Load the dataset
+df = pd.read_csv('hospital_readmissions.csv')
+
+# Change admission & discharge date to date fields
+df['admission_date'] = pd.to_datetime(df['admission_date'])
+df['discharge_date'] = pd.to_datetime(df['discharge_date'])
+
+# Create Length of Stay column
+df['Length of Stay'] = df['discharge_date'] - df['admission_date']
+
+# Drop rows with missing values
+df.dropna(inplace=True)
+
+# Calculate readmission rate by diagnosis and department
+readmission_rate_by_dept_diag = df.groupby(['department', 'diagnosis'])['readmitted'].value_counts(normalize=True).unstack().fillna(0)
+
+# Add readmission rate to original dataframe
+df['Readmission Rate'] = df.set_index(['department', 'diagnosis']).join(readmission_rate_by_dept_diag['Yes'], on=['department', 'diagnosis'])['Yes'].reset_index(drop=True)
+
+# Round readmission rate to 2 decimal places
+df['Readmission Rate'] = df['Readmission Rate'].round(2)
+
+# Save cleaned data to a new CSV file
+df.to_csv('hospital_readmissions_cleaned.csv', index=False)
