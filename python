@@ -9,7 +9,7 @@ df['admission_date'] = pd.to_datetime(df['admission_date'])
 df['discharge_date'] = pd.to_datetime(df['discharge_date'])
 
 # Create Length of Stay column
-df['Length of Stay'] = df['discharge_date'] - df['admission_date']
+df['Length of Stay'] = df['discharge_date'] - df['admission_date'].dt.days
 
 # Drop rows with missing values
 df.dropna(inplace=True)
